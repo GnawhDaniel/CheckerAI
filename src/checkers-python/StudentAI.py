@@ -7,8 +7,9 @@ from BoardClasses import Board
 import math
 import copy
 
+# What is a leaf node? : https://ai.stackexchange.com/questions/25426/unclear-definition-of-a-leaf-and-diverging-utc-values-in-the-monte-carlo-tree
 C = 2
-ITERATIONS = 5
+ITERATIONS = 200
 
 class Node():
     def __init__(self, board, color, parent, move=None):
