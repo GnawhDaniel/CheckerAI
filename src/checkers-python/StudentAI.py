@@ -98,10 +98,10 @@ class StudentAI():
     def simulation(self, root):
         board = copy.deepcopy(root.board)
         turn_table = {1: "W", 2: "B"}
-        current_turn = root.color
+        player = root.color
 
         while True:
-            winner = board.is_win(turn_table[current_turn])
+            winner = board.is_win(turn_table[player])
             if winner != 0:
                 break
 
@@ -111,9 +111,7 @@ class StudentAI():
             move = moves[index][inner_index]
             board.make_move(move, player)
 
-            player = self.opponent[player] # FIX ME
-            current_turn = turn_table[player]
-    
+            player = self.opponent[player] # FIX ME    
         return winner
     
     def backpropogate(self, root, winner):
