@@ -6,9 +6,15 @@ from BoardClasses import Board
 #Students can modify anything except the class name and exisiting functions and varibles.
 import math
 import copy
+import itertools
 
 # What is a leaf node? : https://ai.stackexchange.com/questions/25426/unclear-definition-of-a-leaf-and-diverging-utc-values-in-the-monte-carlo-tree
-C = 2
+# Some struggles - what is a leaf node? How to define it in the context of MCTS
+#                - Best parameters for C and ITERATIONS
+#                - Should I implement a heuristic?
+#                - How to improve runtime efficiency?
+
+C = 1.5
 ITERATIONS = 200
 
 class Node():
@@ -21,7 +27,7 @@ class Node():
         self.s_i = 0
         self.w_i = 0 
         self.children = []
-        self.unexplored_children = self.board.get_all_possible_moves(self.color)
+        self.unexplored_children = list(itertools.chain(*self.board.get_all_possible_moves(self.color)))
     
 class StudentAI():
     def __init__(self,col,row,p):
@@ -85,8 +91,6 @@ class StudentAI():
         
         index = randint(0, len(root.unexplored_children)-1)
         move = root.unexplored_children.pop(index)
-        inner_index = randint(0, len(move)-1)
-        move = move[inner_index]
 
         board = copy.deepcopy(root.board)
         board.make_move(move, root.color)
@@ -111,27 +115,14 @@ class StudentAI():
             move = moves[index][inner_index]
             board.make_move(move, player)
 
-            player = self.opponent[player] # FIX ME    
+            player = self.opponent[player]  
+ 
         return winner
     
     def backpropogate(self, root, winner):
-        place_holder = root
         while root != None:
             root.s_i += 1 # Always increment
             if root.color != winner:
                 root.w_i += 1
             
             root = root.parent
-        # self.print_info(place_holder)
-
-    def print_info(self, root):
-        while root != None:
-            print("Node:")
-            print("s_i: ", root.s_i)
-            print("w_i: ", root.w_i)
-            print("\n")
-            root = root.parent
-
-if __name__ == "__main__":
-    # Branch Test
-    pass
