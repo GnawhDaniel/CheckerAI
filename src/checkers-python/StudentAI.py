@@ -71,7 +71,8 @@ class StudentAI():
         else:
             best_score = float('-inf')
             for child in root.children:
-                if (score:=self.uct_score(child)) > best_score:
+                score = self.uct_score(child)
+                if score > best_score:
                     best_score = score
                     node = child
             return self.selection(node)
@@ -99,8 +100,11 @@ class StudentAI():
         turn_table = {1: "W", 2: "B"}
         current_turn = root.color
 
-        while winner:=(board.is_win(turn_table[current_turn])):
-            
+        while True:
+            winner = board.is_win(turn_table[current_turn])
+            if winner != 0:
+                break
+
             moves = board.get_all_possible_moves(player)
             index = randint(0, len(moves)-1)
             inner_index = randint(0, len(moves[index])-1)
