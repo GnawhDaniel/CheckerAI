@@ -14,20 +14,24 @@ import itertools
 #                - Should I implement a heuristic?
 #                - How to improve runtime efficiency?
 
-C = 1.5
-ITERATIONS = 200
+C = math.sqrt(2)
+ITERATIONS = 300
 
 class Node():
-    def __init__(self, board, color, parent, move=None):
-        self.board = copy.deepcopy(board)
+    def __init__(self, board_history, color, parent, unexplored_children, move=None):
+        self.board_history = board_history
         self.move = move
         self.color = color
         self.parent = parent
+        self.unexplored_children = unexplored_children
 
         self.s_i = 0
         self.w_i = 0 
         self.children = []
-        self.unexplored_children = list(itertools.chain(*self.board.get_all_possible_moves(self.color)))
+
+    def update_history(self, move):
+        self.board_history.append(move)
+
     
 class StudentAI():
     def __init__(self,col,row,p):
@@ -52,10 +56,14 @@ class StudentAI():
         else:
             self.color = 1
 
-        self.root = Node(self.board, self.color, None)
-
+        # list(itertools.chain(*self.board.get_all_possible_moves(self.color)))
+        self.board.saved_move = []
+        get_all_possible_moves = [move for move_list in self.board.get_all_possible_moves(self.color) for move in move_list]
+        self.root = Node([], self.color, None, get_all_possible_moves, None)
+            
         i = 0
         while (i < ITERATIONS):
+            # print(i)
             to_expand = self.selection(self.root)
             child = self.expand(to_expand)
             winner_color = self.simulation(child)
@@ -83,24 +91,51 @@ class StudentAI():
                     node = child
             return self.selection(node)
 
+    def update_board(self, root):
+        color = self.color # Since starting from self.root
+        for move in root.board_history: # Update board w/ root_history
+            self.board.make_move(move, color)
+            color = self.opponent[color]
+    
+    def undo_board(self):
+        while self.board.saved_move != []:
+            self.board.undo()
             
     def expand(self, root):
         if root.unexplored_children == []:
             # This is a terminal node.
             return root
-        
+
+        # print("Current Board: ")
+        # self.board.show_board()
+        self.update_board(root)
+
+        # print("Updated Board:")
+        # self.board.show_board()
+
         index = randint(0, len(root.unexplored_children)-1)
         move = root.unexplored_children.pop(index)
 
-        board = copy.deepcopy(root.board)
-        board.make_move(move, root.color)
-        node = Node(board, self.opponent[root.color], root, move)
+        new_history = list(root.board_history)
+        new_history.append(move)
+
+        self.board.make_move(move, root.color)
+        new_color = self.opponent[root.color]
+
+        get_all_possible_moves = [move for move_list in self.board.get_all_possible_moves(new_color) for move in move_list]
+        node = Node(new_history, new_color, root, get_all_possible_moves, move)
+
+        self.undo_board() # Undo changes to original board
         root.children.append(node)
 
         return node
         
     def simulation(self, root):
-        board = copy.deepcopy(root.board)
+        self.update_board(root)
+        board = self.board
+        # print("Simulated Start Board: ")
+        # self.board.show_board()
+
         turn_table = {1: "W", 2: "B"}
         player = root.color
 
@@ -117,6 +152,7 @@ class StudentAI():
 
             player = self.opponent[player]  
  
+        self.undo_board()
         return winner
     
     def backpropogate(self, root, winner):
