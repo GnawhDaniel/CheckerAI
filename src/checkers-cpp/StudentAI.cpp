@@ -5,7 +5,7 @@
 //The following part should be completed by students.
 //The students can modify anything except the class name and exisiting functions and varibles.
 double C = pow(2, 0.5);
-int ITER = 10;
+int ITER = 1000;
 
 Node::Node(vector<Move> boardHist, int color, Node* parent, vector<Move> unexploredChildren, Move* move)
     :boardHist{boardHist}, color{color}, parent{parent}, unexploredChildren{unexploredChildren}, move{move}
@@ -15,6 +15,15 @@ Node::Node(vector<Move> boardHist, int color, Node* parent, vector<Move> unexplo
 
     s_i = 0;
     w_i = 0;
+}
+
+Node::~Node()
+{
+    for (int i = 0; i < this->children.size(); ++i)
+    {
+        delete this->children[i]->move;
+        delete this->children[i];
+    }
 }
 
 void Node::printChildren()
@@ -55,7 +64,6 @@ vector<Move> flattenVect(vector<vector<Move>> moves)
 
 Move StudentAI::GetMove(Move move)
 {
-    // 1?2:1 self.opponent
     if (move.seq.empty())
     {
         player = 1;
@@ -78,7 +86,7 @@ Move StudentAI::GetMove(Move move)
 
     while (i < ITER)
     {
-        cout << "Loop: " << i << endl;
+        // cout << "Loop: " << i << endl;
         toExpand = selection(root);
         // cout << "1" << endl;
         child = expand(toExpand);
@@ -90,25 +98,22 @@ Move StudentAI::GetMove(Move move)
         ++i;
     }
 
-    cout << "loop finished" << endl;
     double currMax  = -INFINITY;
     Node* bestMove = NULL;
     root->children.size();
     for (int i = 0; i < root->children.size(); ++i)
     {
-        cout << i << endl;
         if ((root->children[i])->s_i > currMax)
         {
             currMax = root->s_i;
             bestMove = root->children[i];
         }
     }
-    cout << "loop finished" << endl;
-    cout << bestMove->move->toString() << endl;
-    board.makeMove(*(bestMove->move), player);
-    board.showBoard();
-    cout << "ret" << endl;
-    return *(bestMove->move);
+
+    Move bestMv = Move(*(bestMove->move));
+    board.makeMove(bestMv, player);
+    delete root;
+    return bestMv;
 }
 
 void StudentAI::updateBoard(Node* node)

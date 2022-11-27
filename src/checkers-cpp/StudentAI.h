@@ -11,7 +11,9 @@ class Node
 {
 public:
     Node(vector<Move> boardHist, int color, Node* parent, vector<Move> unexploredChildren, Move* move);
-	void addHistory(Move move);
+	~Node();
+    void deallocate(Node* node);
+    void addHistory(Move move);
     void printChildren();
 
     vector<Move> boardHist;
