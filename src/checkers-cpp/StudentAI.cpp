@@ -22,8 +22,11 @@ Node::~Node()
 {
     for (int i = 0; i < this->children.size(); ++i)
     {
-        delete this->children[i]->move;
-        delete this->children[i];
+        if (this->children[i]->parent != NULL) // For reusing Tree
+        {
+            delete this->children[i]->move;
+            delete this->children[i];
+        }
     }
 }
 
@@ -59,6 +62,7 @@ StudentAI::StudentAI(int col,int row,int p)
 
     // My Var
     root = NULL;
+    reuseTree = NULL;
     totalPieces = board.blackCount + board.whiteCount;
 }
 
@@ -102,7 +106,7 @@ Move StudentAI::GetMove(Move move)
     Node* child;
     int winner;
 
-    cout << "ITER: " << ITER << endl;
+    // cout << "ITER: " << ITER << endl;
     while (i < ITER)
     { 
         // cout << "Loop: " << i << endl;
@@ -135,6 +139,11 @@ Move StudentAI::GetMove(Move move)
     Move bestMv = *(bestMove->move);
     board.makeMove(bestMv, player);
     // board.showBoard();
+
+    // Node* saveTree = currChild;
+    // saveTree->parent = NULL;
+    // saveTree->boardHist.clear();
+
     delete root;
     return bestMv;
 }

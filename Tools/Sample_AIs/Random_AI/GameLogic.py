@@ -22,7 +22,7 @@ class GameLogic:
         move = Move([])
         board = Board(self.col,self.row,self.p)
         board.initialize_game()
-        board.show_board(fh)
+        # board.show_board(fh)
         while True:
             try:
                 move = self.ai_list[player-1].get_move(move)
@@ -45,7 +45,7 @@ class GameLogic:
                     winPlayer = 1
                 break
             winPlayer = board.is_win(player)
-            board.show_board(fh)
+            # board.show_board(fh)
             if(winPlayer != 0):
                 if self.mode == 'n':#Communate with peer to tell the result.
                     if player == 1:
@@ -60,9 +60,9 @@ class GameLogic:
             else:
                 player = 1
         if winPlayer == -1:
-            print("Tie",file=fh)
+            print("    Tie",file=fh)
         else:
-            print('player',winPlayer,'wins',file=fh)
+            print('    player',winPlayer,'wins',file=fh)
         if self.mode == 'n' or self.mode == 'network' or self.mode == 'l' or self.mode == 'local':
             for AI in self.ai_list:
                 if type(AI) is IOAI:
