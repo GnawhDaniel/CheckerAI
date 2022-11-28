@@ -6,6 +6,7 @@
 //The students can modify anything except the class name and exisiting functions and varibles.
 double C = sqrt(2);
 int ITER = 500;
+int MULT = 60;
 
 Node::Node(vector<Move> boardHist, int color, Node* parent, vector<Move> unexploredChildren, Move* move)
     :boardHist{boardHist}, color{color}, parent{parent}, unexploredChildren{unexploredChildren}, move{move}
@@ -55,7 +56,10 @@ StudentAI::StudentAI(int col,int row,int p)
     board = Board(col,row,p);
     board.initializeGame();
     player = 2;
+
+    // My Var
     root = NULL;
+    totalPieces = board.blackCount + board.whiteCount;
 }
 
 vector<Move> flattenVect(vector<vector<Move>> moves)
@@ -80,6 +84,11 @@ Move StudentAI::GetMove(Move move)
         board.makeMove(move,player == 1?2:1);
     }
     
+    // Add more iters with less pieces on board.
+    int multiplier = totalPieces - (board.blackCount + board.whiteCount);
+    ITER += multiplier * MULT;
+    totalPieces = board.blackCount + board.whiteCount;
+
     board.saved_move_list.clear();
     vector<vector<Move>> getAllMoves = board.getAllPossibleMoves(player);
 
@@ -93,8 +102,9 @@ Move StudentAI::GetMove(Move move)
     Node* child;
     int winner;
 
+    cout << "ITER: " << ITER << endl;
     while (i < ITER)
-    {
+    { 
         // cout << "Loop: " << i << endl;
         toExpand = selection(root);
         // cout << "1" << endl;

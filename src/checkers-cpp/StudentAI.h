@@ -35,6 +35,8 @@ class StudentAI :public AI
 public:
     Board board;
 	Node* root;
+    int totalPieces;
+    
 	StudentAI(int col, int row, int p);
 	virtual Move GetMove(Move board);
 
