@@ -133,13 +133,14 @@ class StudentAI():
         player = root.color
 
         while True:
+
+            winner = board.is_win(turn_table[player])
+            if winner != 0:
+                break
+
             moves = board.get_all_possible_moves(player)
-
-            if not moves:
-                winner = board.is_win(turn_table[player])
-                if winner != 0:
-                    break
-
+            winner = board.is_win(turn_table[player])
+            print(winner, player, moves)
             index = randint(0, len(moves)-1)
             inner_index = randint(0, len(moves[index])-1)
             move = moves[index][inner_index]

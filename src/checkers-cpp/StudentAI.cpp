@@ -110,14 +110,14 @@ Move StudentAI::GetMove(Move move)
     // cout << "loop finished" << endl;
     double currMax  = -INFINITY;
     Node* bestMove = NULL;
-    root->children.size();
+    Node* currChild;
     for (int i = 0; i < root->children.size(); ++i)
     {
-        // cout << i << endl;
-        if ((root->children[i])->s_i > currMax)
+        currChild = root->children[i];
+        if (currChild->s_i > currMax)
         {
-            currMax = root->s_i;
-            bestMove = root->children[i];
+            currMax = currChild->s_i;
+            bestMove = currChild;
         }
     }
     // cout << "loop finished" << endl;
@@ -216,7 +216,7 @@ Node* StudentAI::expand(Node* node)
 
 int StudentAI::simulation(Node* node)
 {
-    int player = root->color;
+    int player = node->color;
     int winner;
     string p;
     vector<vector<Move>> moves;
@@ -234,7 +234,8 @@ int StudentAI::simulation(Node* node)
         {
             p = "B";
         }
-        winner = board.isWin(p);
+        winner = board.isWin(player == 1?2:1); // You need to provide which player just made move before you call this function (generally does not matter, but matters in some edge cases in the checker's rule).
+
 
         if (winner != 0)
         {
@@ -262,7 +263,7 @@ void StudentAI::backpropagate(Node* node, int winner)
         node->s_i++;
         if (node->color != winner)
         {
-            root->w_i++;
+            node->w_i++;
         }
         node = node->parent;
     }
