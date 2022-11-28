@@ -7,6 +7,8 @@
 
 //The following part should be completed by students.
 //Students can modify anything except the class name and exisiting functions and varibles.
+#include <random>
+
 class Node
 {
 public:
@@ -24,8 +26,8 @@ public:
     int color;
     int unexploredChildrenLen;
 
-    int s_i;
-    int w_i;
+    double s_i;
+    double w_i;
 };
 
 class StudentAI :public AI

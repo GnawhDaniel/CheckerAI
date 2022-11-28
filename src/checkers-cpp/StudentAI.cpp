@@ -4,8 +4,8 @@
 
 //The following part should be completed by students.
 //The students can modify anything except the class name and exisiting functions and varibles.
-double C = pow(2, 0.5);
-int ITER = 1000;
+double C = sqrt(2);
+int ITER = 500;
 
 Node::Node(vector<Move> boardHist, int color, Node* parent, vector<Move> unexploredChildren, Move* move)
     :boardHist{boardHist}, color{color}, parent{parent}, unexploredChildren{unexploredChildren}, move{move}
@@ -24,6 +24,15 @@ Node::~Node()
         delete this->children[i]->move;
         delete this->children[i];
     }
+}
+
+void Node::deallocate(Node* node)
+{
+    // for (int i = 0; i < node->children.size(); ++i)
+    // {
+    //     delete node->children[i]->move;
+    //     delete node->children[i];
+    // }
 }
 
 void Node::printChildren()
@@ -98,20 +107,24 @@ Move StudentAI::GetMove(Move move)
         ++i;
     }
 
+    // cout << "loop finished" << endl;
     double currMax  = -INFINITY;
     Node* bestMove = NULL;
     root->children.size();
     for (int i = 0; i < root->children.size(); ++i)
     {
+        // cout << i << endl;
         if ((root->children[i])->s_i > currMax)
         {
             currMax = root->s_i;
             bestMove = root->children[i];
         }
     }
-
-    Move bestMv = Move(*(bestMove->move));
+    // cout << "loop finished" << endl;
+    // cout << bestMove->move->toString() << endl;
+    Move bestMv = *(bestMove->move);
     board.makeMove(bestMv, player);
+    // board.showBoard();
     delete root;
     return bestMv;
 }
