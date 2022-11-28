@@ -47,16 +47,7 @@ class StudentAI():
         
         # My code
         self.root = None
-        # self.time_table = {
-        #     "selection": 0,
-        #     "expand": 0,
-        #     "simulation": 0,
-        #     "backpropagate": 0,
-        #     "check": 0,
-        #     "choose": 0,
-        # }
 
-        # Debug
 
     def uct_score(self, node):
         return (node.w_i/node.s_i) + C*(math.sqrt(math.log(node.parent.s_i)/node.s_i))
@@ -73,27 +64,10 @@ class StudentAI():
             
         i = 0
         while (i < ITERATIONS):
-            print(i)
-            # start = t.time()
             to_expand = self.selection(self.root)
-            # end = t.time()
-            # self.time_table["selection"] += (end-start)
-
-            # start = t.time()
             child = self.expand(to_expand)
-            # end = t.time()
-            # self.time_table["expand"] += (end-start)
-
-            # start = t.time()
             winner_color = self.simulation(child)
-            # end = t.time()
-            # self.time_table["simulation"] += (end-start)
-
-            # start = t.time()
-            self.backpropogate(child, winner_color)
-            # end = t.time()
-            # self.time_table["backpropagate"] += (end-start)
-            
+            self.backpropogate(child, winner_color)            
             i += 1
         
         curr_max_val = float('-inf') 
@@ -103,20 +77,19 @@ class StudentAI():
                 curr_max_val = node.s_i
                 best_move = node.move
         self.board.make_move(best_move, self.color)
-        
-        # for name, time in self.time_table.items():
-        #     print(f"{name}: {time} seconds.")
 
-        # self.time_table = {
-        #     "selection": 0,
-        #     "expand": 0,
-        #     "simulation": 0,
-        #     "backpropagate": 0,
-        #     "check": 0,
-        #     "choose": 0,
-        # }
         return best_move
 
+    def update_board(self, root):
+        color = self.color # Since starting from self.root.
+        for move in root.board_history: # Update board w/ root_history
+            self.board.make_move(move, color)
+            color = self.opponent[color]
+    
+    def undo_board(self):
+        while self.board.saved_move != []:
+            self.board.undo()
+            
     def selection(self, root):
         if root.children == [] or root.unexplored_children_length != 0:
             return root
@@ -129,18 +102,6 @@ class StudentAI():
                     node = child
             return self.selection(node)
 
-    def update_board(self, root):
-        color = self.color # Since starting from self.root
-        # print("start")
-        for move in root.board_history: # Update board w/ root_history
-            # print(color, move)
-            self.board.make_move(move, color)
-            color = self.opponent[color]
-    
-    def undo_board(self):
-        while self.board.saved_move != []:
-            self.board.undo()
-            
     def expand(self, root):
         if root.unexplored_children_length == 0:
             # This is a terminal node.
@@ -161,46 +122,31 @@ class StudentAI():
         get_all_possible_moves = [move for move_list in self.board.get_all_possible_moves(new_color) for move in move_list]
         node = Node(new_history, new_color, root, get_all_possible_moves, move)
 
-        # self.undo_board() # Undo changes to original board
         root.children.append(node)
 
         return node
         
     def simulation(self, root):
-        # self.update_board(root)
         board = self.board
-        # print("Simulated Start Board: ")
-        # self.board.show_board()
 
         turn_table = {1: "W", 2: "B"}
         player = root.color
 
-        # time_table = {
-        #     "check": 0,
-        #     "choose": 0,
-        # }
-
         while True:
-            # s = t.time()
-            winner = board.is_win(turn_table[player])
-            # time_table["check"] += (t.time()-s)
-            if winner != 0:
-                break
-
-            # moves = board.get_all_possible_moves(player)
-            # s = t.time()
             moves = board.get_all_possible_moves(player)
+
+            if not moves:
+                winner = board.is_win(turn_table[player])
+                if winner != 0:
+                    break
+
             index = randint(0, len(moves)-1)
             inner_index = randint(0, len(moves[index])-1)
             move = moves[index][inner_index]
             board.make_move(move, player)
-            # time_table["choose"] += (t.time()-s)
 
 
             player = self.opponent[player]
-
-        # for name, time in time_table.items():
-        #     self.time_table[name] += time
 
         self.undo_board()
         return winner
